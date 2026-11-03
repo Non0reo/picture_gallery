@@ -1,6 +1,6 @@
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { AnimatableObject, createAnimatable, utils } from "animejs";
+import { AnimatableObject, AnimatableParams, createAnimatable, spring, utils } from "animejs";
 
 type Rect = {
   x: number;
@@ -18,7 +18,8 @@ export default class CustomWindow {
 
   size: LogicalSize;
   position: LogicalPosition;
-  private _animatable: AnimatableObject;
+  private _posAnimatable: AnimatableObject;
+  private _sizeAanimatable: AnimatableObject;
 
   private _defaultOptions: Omit<WindowOptions, 'id'> = {
     x: 100,
@@ -27,61 +28,42 @@ export default class CustomWindow {
     height: 200,
   }
 
-  set rect(value: Partial<Rect>) {
-    Object.assign(this.size, value)
-    Object.assign(this.position, value)
-  }
-
-  get rect(): Rect {
-    const { x, y } = this.position;
-    const { width, height } = this.size;
-
-    return { x, y, width, height };
-  }
-
   constructor(options: Partial<WindowOptions>) {
     const { id, width, height, x, y } = Object.assign({}, this._defaultOptions, options);
     this.size = new LogicalSize(width, height);
-    this.position = new LogicalPosition(x, y)
-    this.rect = { x, y, width, height }
+    this.position = new LogicalPosition(x, y);
 
     this.webview = new WebviewWindow('view' + id, {
-      url: 'https://github.com/tauri-apps/tauri',
-      width: 300,
-      height: 200,
+      url: 'https://example.org/',
       decorations: false,
+      width,
+      height,
+      x,
+      y
     });
 
-    this.webview.once('tauri://created', this._onCreation);
-    this.webview.once('tauri://error', this._onError);
+    this.webview.once('tauri://created', this._onCreation.bind(this));
+    this.webview.once('tauri://error', this._onError.bind(this));
 
-    this._animatable = createAnimatable(this.rect, {
+    const commonAnimatableParams: AnimatableParams = {
       x: 1000,
       y: 1000,
       width: 1000,
       height: 1000,
-      ease: 'out',
+      ease: 'inOutQuint',
+      // ease: spring({ bounce: 0.5, duration: 400 }),
       modifier: v => +v.toFixed(0),
-      onRender: async _ => {
-        this.rect = {
-          x: this._animatable.x() as number,
-          y: this._animatable.y() as number,
-          width: this._animatable.width() as number,
-          height: this._animatable.height() as number,
-        }
+    };
 
-        this._updateSize();
-        this._updatePosition();
-      }
+    this._posAnimatable = createAnimatable(this.position, {
+      ...commonAnimatableParams,
+      onRender: async _ => await this._updatePosition()
     });
 
-    setInterval(() => {
-      this._animatable.x(utils.random(1500))
-      this._animatable.y(utils.random(600))
-      this._animatable.width(utils.random(100, 500))
-      this._animatable.height(utils.random(100, 500))
-      
-    }, 2000)
+    this._sizeAanimatable = createAnimatable(this.size, {
+      ...commonAnimatableParams,
+      onRender: async _ => await this._updateSize()
+    });
   }
 
   private async _updateSize() {
@@ -93,7 +75,21 @@ export default class CustomWindow {
   }
 
   private _onCreation() {
+    setTimeout(() => {
+      this._posAnimatable.x(1500)
+      this._posAnimatable.y(600)
+      this._sizeAanimatable.width(0)
+      this._sizeAanimatable.height(0)
+      
+    }, 3000)
 
+    setTimeout(() => {
+      const { x, y } = this.position;
+      this._posAnimatable.x(x - 200)
+      this._posAnimatable.y(y - 150)
+      this._sizeAanimatable.width(400)
+      this._sizeAanimatable.height(300)
+    }, 6000)
   }
 
   private _onError(_e: unknown) {

@@ -1,6 +1,7 @@
 import './styles.css';
 import * as THREE from 'three';
 import { WindowsManager } from './windows';
+import { invoke } from '@tauri-apps/api/core';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -38,3 +39,13 @@ addWindowButton?.addEventListener('click', () => {
 closeWindowsButton?.addEventListener('click', () => {
   windowManager.removeAll()
 });
+
+
+// if (import.meta.hot) {
+//   console.log('test')
+//   windowManager.removeAll()
+// }
+
+
+
+invoke('mouse_pos').then(message => console.log(message))
