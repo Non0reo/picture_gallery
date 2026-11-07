@@ -21,8 +21,13 @@ window.addEventListener('resize', () => {
 });
 
 
+let mousePosition: [number, number] | null = null;
 
 renderer.setAnimationLoop(time => {
+  invoke('mouse_pos').then(value => mousePosition = value as [number, number]);
+  invoke('subscribe_to_mouse_events');
+  // windowManager.
+
   renderer.render( scene, camera );
 });
 
@@ -48,4 +53,3 @@ closeWindowsButton?.addEventListener('click', () => {
 
 
 
-invoke('mouse_pos').then(message => console.log(message))

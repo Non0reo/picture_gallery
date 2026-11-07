@@ -2,5 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    picture_gallery_lib::run()
+    picture_gallery_lib::run();
+
+    // loop {}
 }

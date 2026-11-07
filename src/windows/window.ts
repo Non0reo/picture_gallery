@@ -34,7 +34,8 @@ export default class CustomWindow {
     this.position = new LogicalPosition(x, y);
 
     this.webview = new WebviewWindow('view' + id, {
-      url: 'https://example.org/',
+      // url: 'https://example.org/',
+      url: window.location.href,
       decorations: false,
       width,
       height,
@@ -64,6 +65,12 @@ export default class CustomWindow {
       ...commonAnimatableParams,
       onRender: async _ => await this._updateSize()
     });
+
+    this._initEvents();
+  }
+
+  private _initEvents() {
+    window.addEventListener('pointerdown', () => console.log('pointer down'))
   }
 
   private async _updateSize() {
