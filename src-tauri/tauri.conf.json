@@ -14,8 +14,8 @@
     "windows": [
       {
         "title": "picture-gallery",
-        "width": 800,
-        "height": 600
+        "visible": false,
+        "decorations": false
       }
     ],
     "security": {
