@@ -2,7 +2,7 @@ import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/dpi";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { AnimatableObject, AnimatableParams, createAnimatable, spring, utils } from "animejs";
 import { Mouse, WindowOptions } from "../types";
-import { arrayForm } from '../utils/values'
+import { arrayForm, Input, Position, Size } from '../utils/values'
 import { TauriEvent } from "@tauri-apps/api/event";
 
 export default class CustomWindow {
@@ -22,34 +22,42 @@ export default class CustomWindow {
     height: 200,
   }
 
-
-  /** Animate the size of this {@link CustomWindow} */
-  set size(options: {width: number, height: number} | [number, number]) {
-    const [ width, height ] = arrayForm(options);
-    this._sizeAanimatable.width(width)
-    this._sizeAanimatable.height(height)
+  /** Animate the position of this {@link CustomWindow} */
+  set position(options: Input<Position>) {
+    const [ duration, ease, x, y ] = arrayForm(options);
+    this._posAnimatable.x(x, duration, ease)
+    this._posAnimatable.y(y, duration, ease)
   }
 
-  /** Animate the position of this {@link CustomWindow} */
-  set position(options: {x: number, y: number} | [number, number]) {
-    const [ x, y ] = arrayForm(options);
-    this._posAnimatable.x(x)
-    this._posAnimatable.y(y)
+  /** Animate the size of this {@link CustomWindow} */
+  set size(options: Input<Size>) {
+    const [ duration, ease, width, height ] = arrayForm(options);
+    this._sizeAanimatable.width(width, duration, ease)
+    this._sizeAanimatable.height(height, duration, ease)
+  }
+
+  /** Animate the position of this {@link CustomWindow} to its center */
+  set center(options: Input<Position>) {
+    const [ duration, ease, x, y ] = arrayForm(options);
+    const { width, height } = this.size;
+    this.position = {
+      x: x - width / 2,
+      y: y - height / 2,
+      duration,
+      ease
+    }
   }
   
   /** Animate the size of this {@link CustomWindow} acording to the center of the window */
-  set centerSize(options: {width: number, height: number} | [number, number]) {
-    const [ newWidth, newHeight ] = arrayForm(options);
+  set centerSize(options: Input<Size>) {
+    const [ duration, ease, newWidth, newHeight ] = arrayForm(options);
     this.size = options;
-    // this.position = [
-    //   this.center.x - newWidth / 2,
-    //   this.center.y - newHeight / 2
-    // ];
-    
-    this.position = [
-      this.position.x + (this.size.width - newWidth) / 2,
-      this.position.y + (this.size.height - newHeight) / 2,
-    ];
+    this.position = {
+      x: this.position.x + (this.size.width - newWidth) / 2,  
+      y: this.position.y + (this.size.height - newHeight) / 2,
+      duration,
+      ease
+    }
   }
 
   /** Get the size of this {@link CustomWindow} */
@@ -89,16 +97,12 @@ export default class CustomWindow {
     }
 
     this.webview.once(TauriEvent.WINDOW_CREATED, this._onCreation.bind(this));
-    this.webview.listen(TauriEvent.WINDOW_MOVED, this._onMove.bind(this));
+    // this.webview.listen(TauriEvent.WINDOW_MOVED, this._onMove.bind(this));
     this.webview.once('tauri://error', this._onError.bind(this));
 
     const commonAnimatableParams: AnimatableParams = {
       modifier: v => +v.toFixed(0),
-      x: 1000,
-      y: 1000,
-      width: 1000,
-      height: 1000,
-      ease: 'inOutQuint',
+      ease: 'outExpo'
       // ease: spring({ bounce: 0.5, duration: 400 }),
       
       // onBegin(self) {
@@ -107,13 +111,17 @@ export default class CustomWindow {
     };
 
     this._posAnimatable = createAnimatable(this._position, {
+      x: 1000,
+      y: 1000,
       ...commonAnimatableParams,
-      onRender: async _ => await this._updatePosition()
+      // onRender: async _ => await this._updatePosition()
     });
 
     this._sizeAanimatable = createAnimatable(this._size, {
+      width: 1000,
+      height: 1000,
       ...commonAnimatableParams,
-      onRender: async _ => await this._updateSize()
+      // onRender: async _ => await this._updateSize()
     });
   }
 
@@ -126,15 +134,30 @@ export default class CustomWindow {
   }
 
 
-  private async _updateSize() {
-    // console.log(this._size)
-    await this.webview.setSize(this._size)
+  update(size: boolean = true, pos: boolean = true) {
+    pos && this._updatePosition();
+    size && this._updateSize();
   }
 
-  private async _updatePosition() {
-    // console.log(this._position)
-    await this.webview.setPosition(this._position)
+  private _updateSize() {
+    // console.log(this._size)
+    this.webview.setSize(this._size)
   }
+
+  private _updatePosition() {
+    // console.log(this._position)
+    this.webview.setPosition(this._position)
+  }
+
+  // private async _updateSize() {
+  //   // console.log(this._size)
+  //   await this.webview.setSize(this._size)
+  // }
+
+  // private async _updatePosition() {
+  //   // console.log(this._position)
+  //   await this.webview.setPosition(this._position)
+  // }
 
   private _onCreation() {
 
@@ -169,16 +192,13 @@ export default class CustomWindow {
     // }, 1000)
   }
 
-  private _onMove(e: any) {
-    console.log(e.payload)
-    const { x, y } = e.payload;
-    this._position.x = x;
-    this._position.y = y;
-
-    // this._posAnimatable
-  }
+  
 
   private _onError(_e: unknown) {
 
+  }
+
+  onDrag(mouse: Mouse) {
+    this.center = {...mouse};
   }
 }

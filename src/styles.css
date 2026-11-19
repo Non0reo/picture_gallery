@@ -9,5 +9,11 @@
 body {
   margin: 0;
   overflow: hidden;
-  app-region: drag;
+  /* app-region: drag; */
+}
+
+.buttons {
+  position: fixed;
+  top: 0;
+  left: 0;
 }

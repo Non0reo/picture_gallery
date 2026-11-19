@@ -70,8 +70,9 @@ export default class WindowsManager {
   onMouseMove(/* delta: {x: } */) {
     if (!this._grabbedWindow) return;
 
-    console.log(this.mouse)
-    this._grabbedWindow.position = this.mouse
+    // console.log(this.mouse)
+    this._grabbedWindow.onDrag(this.mouse)
+    // this._grabbedWindow.position = this.mouse;
   }
 
 

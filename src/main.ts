@@ -22,7 +22,7 @@ class PictureGaleryApp {
   timer?: Timer;
   mouse: Mouse ; //Acually a Proxy object
 
-  private _isLeftPressed = false;
+  // private _isLeftPressed = false;
   private _threeEngine = new ThreeEngine();
   private _mainWindow = getCurrentWebviewWindow();
   private _startupSize = 1; //It don't work with 0
@@ -36,28 +36,28 @@ class PictureGaleryApp {
         // console.log(mouse, prop, value, receiver);
 
         const hasChanged = value !== mouse[prop];
-        mouse[prop] = value;
+        // mouse[prop] = value;
         
 
         if (hasChanged) {
-          // (this.windowManager.mouse as any)[prop] = value;
+          (this.windowManager.mouse as any)[prop] = value;
 
-          // if (prop === 'left') 
-          //   this.windowManager.checkMouseIntersections(value);
+          if (prop === 'left') 
+            this.windowManager.checkMouseIntersections(value);
 
-          // else
-          //   this.windowManager.onMouseMove();
+          else
+            this.windowManager.onMouseMove();
 
           // else if (prop === 'x')  {
           //   const delta = value - mouse[prop];
           //   console.log(delta)
           // }
 
-          // mouse[prop] = value;
+          mouse[prop] = value;
         }
-        // else {
-        //   mouse[prop] = value;
-        // }
+        else {
+          mouse[prop] = value;
+        }
 
         return true;
       }
@@ -67,10 +67,21 @@ class PictureGaleryApp {
     this._startup()
       .then(() => {
 
-        setTimeout(() => {
-          //This mainWindow uses the CustomWindow object used for animations
-          this.windowManager.mainWindow.centerSize = [400, 400]
-        }, 1000);
+        // setTimeout(() => {
+        //   //This mainWindow uses the CustomWindow object used for animations
+        //   this.windowManager.mainWindow.centerSize = {
+        //     width: 400,
+        //     height: 400,
+        //     ease: 'inOutQuint'
+        //   }
+        // }, 1000);
+
+        this.windowManager.mainWindow.centerSize = {
+          width: 400,
+          height: 400,
+          ease: 'inOutQuint',
+          duration: 1
+        }
 
       });
   }
@@ -118,7 +129,7 @@ class PictureGaleryApp {
     this._initEvents();
     this.timer = createTimer({
       onUpdate: self => this._onUpdate(self),
-      frameRate: 30,
+      frameRate: 60,
     });    
   }
 
@@ -156,21 +167,18 @@ class PictureGaleryApp {
 
     invoke('poll_mouse').then(value => {
       const [pos, left] = value as [[number, number], boolean];
-      // this.mouse = {
-      //   x: pos[0],
-      //   y: pos[1],
-      //   left
-      // }
       this.mouse.x = pos[0];
       this.mouse.y = pos[1];
       this.mouse.left = left; 
     });
 
+    this.windowManager.windows.forEach(win => win.update())
+
     // if (this._isLeftPressed)
 
     // console.log(this.windowManager)
     // this.windowManager?.checkMouseIntersections(this.mouse)
-    // renderer.render( scene, camera );
+    this._threeEngine.render();
   }
 
 

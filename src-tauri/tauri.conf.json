@@ -15,7 +15,8 @@
       {
         "title": "picture-gallery",
         "visible": false,
-        "decorations": false
+        "decorations": false,
+        "transparent": true
       }
     ],
     "security": {
