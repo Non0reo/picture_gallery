@@ -42,14 +42,13 @@ export default class WindowsManager {
     if (pressed) {
       // if (!this.mouse.x || !this.mouse.y) return;
 
-      console.log(pressed)
+      // console.log(pressed)
 
       const window = this.windows.find(window => window.movable && window.isMouseIntersecting(this.mouse));
 
       if (window) {
         this._grabbedWindow = window;
         window.grabbed = true;
-        console.log(window)
       }
     }
     else {

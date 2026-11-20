@@ -24,9 +24,10 @@ class PictureGaleryApp {
   // private _isLeftPressed = false;
   private _mainWebview = currentWebview;
   private _mainCustomWindow?: CustomWindow;
-  private _threeEngine = new ThreeEngine();
-  private _startupSize = 1; //It don't work with 0
   private _isMainInstance = this._mainWebview.label === 'main';
+  private _threeEngine = new ThreeEngine(this._isMainInstance);
+  private _startupSize = 1; //It don't work with 0
+  
     
   static { new PictureGaleryApp() }
 
@@ -67,31 +68,32 @@ class PictureGaleryApp {
         // this.windowManager.mainWindow.centerSize = {
         if (!this._mainCustomWindow) return;
 
-        // if (this._isMainInstance) {
-        //   this._mainCustomWindow.centerSize = {
-        //     // width: 1680,
-        //     // height: 945,
-        //     width: 400,
-        //     height: 400,
-        //     ease: 'inOutQuint',
-        //     // duration: 80
-        //   }
-        // }
-        // else {
-        //   this._mainCustomWindow.centerSize = {
-        //     width: 400,
-        //     height: 400,
-        //     ease: 'inOutQuint',
-        //     // duration: 80
-        //   }
-        // }
-
-        this._mainCustomWindow.centerSize = {
+        if (this._isMainInstance) {
+          this._mainCustomWindow.centerSize = {
+            // width: 1680,
+            // height: 945,
+            width: 400,
+            height: 400,
+            ease: 'inOutQuint',
+            // duration: 10000
+            // duration: 80
+          }
+        }
+        else {
+          this._mainCustomWindow.centerSize = {
             width: 400,
             height: 400,
             ease: 'inOutQuint',
             // duration: 80
           }
+        }
+
+        // this._mainCustomWindow.centerSize = {
+        //   width: 400,
+        //   height: 400,
+        //   ease: 'inOutQuint',
+        //   // duration: 80
+        // }
 
         
 

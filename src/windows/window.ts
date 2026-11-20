@@ -14,7 +14,7 @@ export default class CustomWindow {
   private _position: PhysicalPosition;
   private _posAnimatable: AnimatableObject;
   private _sizeAanimatable: AnimatableObject;
-  private _needsUpdate = false;
+  // private _needsUpdate = false;
 
   private _defaultOptions: Omit<WindowOptions, 'id'> = {
     x: 100,
@@ -27,27 +27,15 @@ export default class CustomWindow {
   /** Animate the position of this {@link CustomWindow} */
   set position(options: Input<Position>) {
     const [ duration, ease, x, y ] = arrayForm(options);
-    this._posAnimatable.x(x, duration, ease)
-    this._posAnimatable.y(y, duration, ease)
-    // this.webview.setPosition(this._position)
-    // const [ _, __, x, y ] = arrayForm(options);
-    
-    // const {} = this.webview.window.outerPosition()
-    // this._position.x = x;
-    // this._position.y = y;
-
-    // console.log(this.webview)
-    // this.webview.outerPosition().then(pos => {
-    //   this._position.x = pos.x;
-    //   this._position.y = pos.y
-    // })
+    this._posAnimatable.x(x, duration, ease);
+    this._posAnimatable.y(y, duration, ease);
   }
 
   /** Animate the size of this {@link CustomWindow} */
   set size(options: Input<Size>) {
     const [ duration, ease, width, height ] = arrayForm(options);
-    this._sizeAanimatable.width(width, duration, ease)
-    this._sizeAanimatable.height(height, duration, ease)
+    this._sizeAanimatable.width(width, duration, ease);
+    this._sizeAanimatable.height(height, duration, ease);
   }
 
   /** Animate the position of this {@link CustomWindow} to its center */
@@ -126,7 +114,7 @@ export default class CustomWindow {
       // onBegin(self) {
       //   self.fps = 30
       // },
-      onRender: () => this._needsUpdate = true
+      // onRender: () => this._needsUpdate = true
     };
 
     this._posAnimatable = createAnimatable(this._position, {
@@ -154,12 +142,12 @@ export default class CustomWindow {
 
 
   update(size: boolean = true, pos: boolean = true) {
-    if (!this._needsUpdate) return;
+    // if (!this._needsUpdate) return;
     // console.log('UPDATE')
     pos && this._updatePosition();
     size && this._updateSize();
 
-    this._needsUpdate = false;
+    // this._needsUpdate = false;
   }
 
   private _updateSize() {

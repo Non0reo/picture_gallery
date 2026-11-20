@@ -2,6 +2,7 @@
 
 :root {
   --background: #19171d;
+  --background: transparent;
   --text: rgb(from white r g b / 0.8);
 
   color: var(--text);
