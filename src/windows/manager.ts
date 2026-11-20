@@ -1,6 +1,7 @@
 import { Mouse, WindowOptions } from "../types";
 import { defaultMouse } from '../utils/values';
 import CustomWindow from "./window";
+import mainMonitor from "../utils/monitor";
 
 export default class WindowsManager {
   windows: CustomWindow[] = [];
@@ -16,20 +17,31 @@ export default class WindowsManager {
   // }
 
 
+  // get mainWindow() {
+  //   const window = this._mainWindow ?? this.windows.at(0);
+  //   if (!window) throw new ReferenceError('No "main" window were declared')
+  //   return window;
+  // }
 
-  get mainWindow() {
-    const window = this._mainWindow ?? this.windows.at(0);
-    if (!window) throw new ReferenceError('No "main" window were declared')
-    return window;
-  }
+  // setMainWindow(mainWebviewWindowOptions: Omit<Required<WindowOptions>, 'id'>) {
+  //   this.windows.push( this._mainWindow = new CustomWindow( mainWebviewWindowOptions ) )
+  //   return this._mainWindow;
+  // }
 
-  setMainWindow(mainWebviewWindowOptions: Omit<Required<WindowOptions>, 'id'>) {
-    this.windows.push( this._mainWindow = new CustomWindow( mainWebviewWindowOptions ) )
-  }
+  // addWindow() {
+  //   const newId: string = 'view' + this.windows.length;
+  //   const customWindow = new CustomWindow({ id: newId });
+  //   this.windows.push( customWindow );
+  //   return customWindow;
+  // }
 
-  addWindow() {
+  addWindow(webviewWindowOptions?: Partial<WindowOptions>) {
     const newId: string = 'view' + this.windows.length;
-    this.windows.push( new CustomWindow({ id: newId }) )
+    const customWindowOptions = Object.assign({ id: newId }, webviewWindowOptions)
+
+    const customWindow = new CustomWindow(customWindowOptions);
+    this.windows.push( customWindow );
+    return customWindow;
   }
 
   removeAll() {

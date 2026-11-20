@@ -66,7 +66,7 @@ export default class CustomWindow {
   /** Get the position of this {@link CustomWindow} */
   get position(): PhysicalPosition { return this._position; }
 
-  get center() {
+  get center(): Position {
     return {
       x: this.position.x + this.size.width / 2,
       y: this.position.y + this.size.height / 2,
@@ -126,8 +126,6 @@ export default class CustomWindow {
   }
 
   isMouseIntersecting(mouse: Pick<Mouse, 'x' | 'y'>): boolean {
-    // console.log(mouse)
-    // console.log(this.position.x, mouse.x, this.position.x <= mouse.x)
 
     return this._position.x <= mouse.x && mouse.x <= this._position.x + this._size.width
         && this._position.y <= mouse.y && mouse.y <= this._position.y + this._size.height
@@ -140,59 +138,25 @@ export default class CustomWindow {
   }
 
   private _updateSize() {
-    // console.log(this._size)
     this.webview.setSize(this._size)
   }
 
   private _updatePosition() {
-    // console.log(this._position)
     this.webview.setPosition(this._position)
   }
 
   // private async _updateSize() {
-  //   // console.log(this._size)
   //   await this.webview.setSize(this._size)
   // }
 
   // private async _updatePosition() {
-  //   // console.log(this._position)
   //   await this.webview.setPosition(this._position)
   // }
 
   private _onCreation() {
-
-    // setTimeout(() => {
-    //   // this._posAnimatable.x(1500)
-    //   // this._posAnimatable.y(600)
-    //   // this._sizeAanimatable.width(100)
-    //   // this._sizeAanimatable.height(100)
-
-    //   // this.size = {width: 100, height: 100}
-    //   // this.size = [100, 100]
     //   this.centerSize = [150, 150]
-
-      
-    // }, 3000)
-
-    // setTimeout(() => {
-    //   const { x, y } = this.position;
-    //   this._posAnimatable.x(x - 200)
-    //   this._posAnimatable.y(y - 150)
-    //   this._sizeAanimatable.width(400)
-    //   this._sizeAanimatable.height(300)
-    // }, 6000);
-
-
-    // setInterval(() => {
-      
-    //   this._posAnimatable.x(utils.random(1000))
-    //   this._posAnimatable.y(utils.random(600))
-    //   this._sizeAanimatable.width(utils.random(500))
-    //   this._sizeAanimatable.height(utils.random(500))
-    // }, 1000)
   }
 
-  
 
   private _onError(_e: unknown) {
 

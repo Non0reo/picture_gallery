@@ -1,30 +1,29 @@
 import './styles.css';
 
-import { availableMonitors, PhysicalPosition, PhysicalSize } from '@tauri-apps/api/window';
+import { PhysicalPosition, PhysicalSize } from '@tauri-apps/api/window';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { invoke } from '@tauri-apps/api/core';
 import { createTimer, Timer } from 'animejs';
 
 import { defaultMouse } from './utils/values';
-import { WindowsManager } from './windows';
+import { CustomWindow, WindowsManager } from './windows';
 import { ThreeEngine } from './three'
 import { Mouse } from './types';
+import mainMonitor from './utils/monitor'
 
-
-const monitors = await availableMonitors();
-const mainDisplay = monitors[0];
-
+const currentWebview = getCurrentWebviewWindow();
 
 //@ts-ignore The class auto execute at statup. C'est de la magie omg
 class PictureGaleryApp {
   
   windowManager: WindowsManager = new WindowsManager();
   timer?: Timer;
-  mouse: Mouse ; //Acually a Proxy object
+  mouse: Mouse; //Acually a Proxy object
 
   // private _isLeftPressed = false;
+  private _mainWebview = currentWebview;
+  private _mainCustomWindow?: CustomWindow;
   private _threeEngine = new ThreeEngine();
-  private _mainWindow = getCurrentWebviewWindow();
   private _startupSize = 1; //It don't work with 0
     
   static { new PictureGaleryApp() }
@@ -76,11 +75,14 @@ class PictureGaleryApp {
         //   }
         // }, 1000);
 
-        this.windowManager.mainWindow.centerSize = {
+        // this.windowManager.mainWindow.centerSize = {
+        if (!this._mainCustomWindow) return;
+
+        this._mainCustomWindow.centerSize = {
           width: 400,
           height: 400,
           ease: 'inOutQuint',
-          duration: 1
+          // duration: 1
         }
 
       });
@@ -95,8 +97,8 @@ class PictureGaleryApp {
   private async _startup() {
 
     const pPosition = new PhysicalPosition(
-      mainDisplay.size.width / 2 - this._startupSize,
-      mainDisplay.size.height / 2 - this._startupSize
+      mainMonitor.size.width / 2 - this._startupSize,
+      mainMonitor.size.height / 2 - this._startupSize
     );
     const pSize = new PhysicalSize(
       this._startupSize * 2,
@@ -106,24 +108,24 @@ class PictureGaleryApp {
     const { width, height } = pSize;
     
 
-    await this._mainWindow.setPosition(pPosition)
-    await this._mainWindow.setSize(pSize)
+    await this._mainWebview.setPosition(pPosition)
+    await this._mainWebview.setSize(pSize)
 
-    await this._mainWindow.show();
-    await this._mainWindow.setFocus();
-    // await this._mainWindow.setAlwaysOnTop(false)
+    await this._mainWebview.show();
+    await this._mainWebview.setFocus();
+    // await this._mainWebview.setAlwaysOnTop(false)    
 
-    
-
-    // this.mouse.x = 43;
-    // console.log(this.mouse)
-    
-
-    //Declare the main window as a CustomWindow in the manager
-    this.windowManager.setMainWindow({
-      webview: this._mainWindow,
-      x, y, width, height
+    //Declare the main webview as a CustomWindow in the manager
+    // this._mainCustomWindow = this.windowManager.setMainWindow({
+    //   webview: this._mainWebview,
+    //   x, y, width, height
+    // });
+    this._mainCustomWindow = this.windowManager.addWindow({
+      webview: this._mainWebview,
+      x, y, width, height,
     });
+
+    this._threeEngine.attachWindow(this._mainCustomWindow);
 
 
     this._initEvents();
