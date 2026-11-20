@@ -14,12 +14,12 @@ export default class WindowsManager {
   //   // console.warn(this._mouse, mouse)
   // }
 
-  addWindow(webviewWindowOptions?: Partial<WindowOptions>) {
+  declareCustomWindow(webviewWindowOptions?: Partial<WindowOptions>, addToManager: boolean = true) {
     const newId: string = 'view' + this.windows.length;
     const customWindowOptions = Object.assign({ id: newId }, webviewWindowOptions)
 
     const customWindow = new CustomWindow(customWindowOptions);
-    this.windows.push( customWindow );
+    if (addToManager) this.windows.push( customWindow );
     return customWindow;
   }
 

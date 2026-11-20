@@ -20,6 +20,10 @@ export default class ThreeEngine {
     this.camera = new THREE.PerspectiveCamera( 75, mainMonitor.size.width / mainMonitor.size.height, 0.1, 1000 );
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
 
+    // this.renderer.setScissorTest(true);
+    // this.renderer.setViewport(0, 0, mainMonitor.size.width, mainMonitor.size.height);
+    // this.renderer.setScissor(0, 0, mainMonitor.size.width, mainMonitor.size.height)
+
     this.scene.background = new THREE.Color('red');
     this.renderer.shadowMap.enabled = true;
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -41,7 +45,9 @@ export default class ThreeEngine {
     this._gltfLoader.setDRACOLoader(this._dracoLoader);
 
     // this.debugOrbit = new OrbitControls(this.camera, this.renderer.domElement);
-    this.debugScene()
+    this.debugScene();
+
+    // this.renderer.setAnimationLoop(() => this.render())
   }
 
   attachWindow(customWindow: CustomWindow) {

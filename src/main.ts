@@ -12,6 +12,7 @@ import { Mouse } from './types';
 import mainMonitor from './utils/monitor'
 
 const currentWebview = getCurrentWebviewWindow();
+const deltatimeParagraph = document.getElementById('deltatime') as HTMLParagraphElement;
 
 //@ts-ignore The class auto execute at statup. C'est de la magie omg
 class PictureGaleryApp {
@@ -25,39 +26,27 @@ class PictureGaleryApp {
   private _mainCustomWindow?: CustomWindow;
   private _threeEngine = new ThreeEngine();
   private _startupSize = 1; //It don't work with 0
+  private _isMainInstance = this._mainWebview.label === 'main';
     
   static { new PictureGaleryApp() }
 
   constructor() {
 
     this.mouse = new Proxy<Mouse>(defaultMouse, {
-      set: (mouse: any, prop: keyof Mouse, value, receiver) => {
-        // console.log(mouse, prop, value, receiver);
+      set: (mouse: any, prop: keyof Mouse, value) => {
 
         const hasChanged = value !== mouse[prop];
-        // mouse[prop] = value;
-        
 
         if (hasChanged) {
           (this.windowManager.mouse as any)[prop] = value;
 
           if (prop === 'left') 
             this.windowManager.checkMouseIntersections(value);
-
           else
             this.windowManager.onMouseMove();
-
-          // else if (prop === 'x')  {
-          //   const delta = value - mouse[prop];
-          //   console.log(delta)
-          // }
-
-          mouse[prop] = value;
-        }
-        else {
-          mouse[prop] = value;
         }
 
+        mouse[prop] = value;
         return true;
       }
     });
@@ -78,12 +67,33 @@ class PictureGaleryApp {
         // this.windowManager.mainWindow.centerSize = {
         if (!this._mainCustomWindow) return;
 
+        // if (this._isMainInstance) {
+        //   this._mainCustomWindow.centerSize = {
+        //     // width: 1680,
+        //     // height: 945,
+        //     width: 400,
+        //     height: 400,
+        //     ease: 'inOutQuint',
+        //     // duration: 80
+        //   }
+        // }
+        // else {
+        //   this._mainCustomWindow.centerSize = {
+        //     width: 400,
+        //     height: 400,
+        //     ease: 'inOutQuint',
+        //     // duration: 80
+        //   }
+        // }
+
         this._mainCustomWindow.centerSize = {
-          width: 400,
-          height: 400,
-          ease: 'inOutQuint',
-          // duration: 1
-        }
+            width: 400,
+            height: 400,
+            ease: 'inOutQuint',
+            // duration: 80
+          }
+
+        
 
       });
   }
@@ -115,11 +125,17 @@ class PictureGaleryApp {
     await this._mainWebview.setFocus();
     // await this._mainWebview.setAlwaysOnTop(false)    
 
-    //Declare the main webview as a CustomWindow in the manager
-    this._mainCustomWindow = this.windowManager.addWindow({
+
+
+    //Declare the current webview as a CustomWindow in the manager
+    //Only add to the manager if it's the "main" webview
+    this._mainCustomWindow = this.windowManager.declareCustomWindow({
       webview: this._mainWebview,
       x, y, width, height,
-    });
+      // movable: !this._isMainInstance
+    // }, this._isMainInstance );
+    }, true );
+    console.log(this.windowManager)
 
     this._threeEngine.attachWindow(this._mainCustomWindow);
 
@@ -141,7 +157,9 @@ class PictureGaleryApp {
     const shrink = document.querySelector('.shrink') as HTMLButtonElement;
 
     addWindowButton?.addEventListener('click', () => {
-      this.windowManager?.addWindow()
+      this.windowManager?.declareCustomWindow({
+        id: 'portal',
+      }, false)
     })
 
 
@@ -163,11 +181,15 @@ class PictureGaleryApp {
   private _onUpdate(_timer: Timer) {
     // console.log('hello')
 
+    // console.log(Math.round(_timer.currentTime / 10) % 4)
+    if (Math.round(_timer.currentTime / 10) % 4 === 0) deltatimeParagraph.innerText = _timer.deltaTime.toString();
+
     invoke('poll_mouse').then(value => {
       const [pos, left] = value as [[number, number], boolean];
       this.mouse.x = pos[0];
       this.mouse.y = pos[1];
-      this.mouse.left = left; 
+      this.mouse.left = left;
+      // console.log(this.mouse)
     });
 
     this.windowManager.windows.forEach(win => win.update())

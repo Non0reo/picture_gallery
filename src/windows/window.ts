@@ -14,12 +14,14 @@ export default class CustomWindow {
   private _position: PhysicalPosition;
   private _posAnimatable: AnimatableObject;
   private _sizeAanimatable: AnimatableObject;
+  private _needsUpdate = false;
 
   private _defaultOptions: Omit<WindowOptions, 'id'> = {
     x: 100,
     y: 100,
     width: 300,
     height: 200,
+    movable: true,
   }
 
   /** Animate the position of this {@link CustomWindow} */
@@ -27,6 +29,18 @@ export default class CustomWindow {
     const [ duration, ease, x, y ] = arrayForm(options);
     this._posAnimatable.x(x, duration, ease)
     this._posAnimatable.y(y, duration, ease)
+    // this.webview.setPosition(this._position)
+    // const [ _, __, x, y ] = arrayForm(options);
+    
+    // const {} = this.webview.window.outerPosition()
+    // this._position.x = x;
+    // this._position.y = y;
+
+    // console.log(this.webview)
+    // this.webview.outerPosition().then(pos => {
+    //   this._position.x = pos.x;
+    //   this._position.y = pos.y
+    // })
   }
 
   /** Animate the size of this {@link CustomWindow} */
@@ -75,20 +89,24 @@ export default class CustomWindow {
 
 
   constructor(options: Partial<WindowOptions>) {
-    const { id, width, height, x, y, webview } = Object.assign({}, this._defaultOptions, options);
+    const { id, width, height, x, y, webview, movable } = Object.assign({}, this._defaultOptions, options);
 
     this._size = new PhysicalSize(width, height);
     this._position = new PhysicalPosition(x, y);
+    this.movable = movable ?? true;
 
     if (!webview) {
       this.webview = new WebviewWindow('view' + id, {
         // url: 'https://example.org/',
         url: window.location.href,
         decorations: false,
+        visible: false,
+        transparent: true,
         width,
         height,
         x,
-        y
+        y,
+        
       });
     }
     else {
@@ -102,12 +120,13 @@ export default class CustomWindow {
 
     const commonAnimatableParams: AnimatableParams = {
       modifier: v => +v.toFixed(0),
-      ease: 'outExpo'
+      ease: 'outExpo',
       // ease: spring({ bounce: 0.5, duration: 400 }),
       
       // onBegin(self) {
       //   self.fps = 30
       // },
+      onRender: () => this._needsUpdate = true
     };
 
     this._posAnimatable = createAnimatable(this._position, {
@@ -115,6 +134,7 @@ export default class CustomWindow {
       y: 1000,
       ...commonAnimatableParams,
       // onRender: async _ => await this._updatePosition()
+      // onRender: _ => this._updatePosition()
     });
 
     this._sizeAanimatable = createAnimatable(this._size, {
@@ -122,6 +142,7 @@ export default class CustomWindow {
       height: 1000,
       ...commonAnimatableParams,
       // onRender: async _ => await this._updateSize()
+      // onRender: _ => this._updateSize()
     });
   }
 
@@ -133,16 +154,24 @@ export default class CustomWindow {
 
 
   update(size: boolean = true, pos: boolean = true) {
+    if (!this._needsUpdate) return;
+    // console.log('UPDATE')
     pos && this._updatePosition();
     size && this._updateSize();
+
+    this._needsUpdate = false;
   }
 
   private _updateSize() {
-    this.webview.setSize(this._size)
+    // console.log(this._size)
+    // console.log()
+    const now = Temporal.Now.instant().epochMilliseconds;
+    this.webview.setSize(this._size).then(() => console.log(Temporal.Now.instant().epochMilliseconds - now))
   }
 
   private _updatePosition() {
-    this.webview.setPosition(this._position)
+    const now = Temporal.Now.instant().epochMilliseconds;
+    this.webview.setPosition(this._position).then(() => console.log(Temporal.Now.instant().epochMilliseconds - now))
   }
 
   // private async _updateSize() {
@@ -163,6 +192,8 @@ export default class CustomWindow {
   }
 
   onDrag(mouse: Mouse) {
-    this.center = {...mouse};
+    // this.center = {...mouse};
+    this.center = mouse;
+    // this.update(false)
   }
 }

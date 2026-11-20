@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
 :root {
   --background: #19171d;
-  --text: rgb(from white r g b / 0.8)
+  --text: rgb(from white r g b / 0.8);
 
   color: var(--text);
   background-color: var(--background);
+  font-family: "Outfit";
 }
 
 body {

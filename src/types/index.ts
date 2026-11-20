@@ -15,6 +15,7 @@ type Rect = {
 
 type WindowOptions = {
   id: string;
+  movable?: boolean;
   webview?: WebviewWindow;
 } & Rect
 
