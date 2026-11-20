@@ -116,10 +116,6 @@ class PictureGaleryApp {
     // await this._mainWebview.setAlwaysOnTop(false)    
 
     //Declare the main webview as a CustomWindow in the manager
-    // this._mainCustomWindow = this.windowManager.setMainWindow({
-    //   webview: this._mainWebview,
-    //   x, y, width, height
-    // });
     this._mainCustomWindow = this.windowManager.addWindow({
       webview: this._mainWebview,
       x, y, width, height,

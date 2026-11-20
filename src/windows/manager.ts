@@ -1,38 +1,17 @@
 import { Mouse, WindowOptions } from "../types";
 import { defaultMouse } from '../utils/values';
 import CustomWindow from "./window";
-import mainMonitor from "../utils/monitor";
 
 export default class WindowsManager {
   windows: CustomWindow[] = [];
   mouse: Mouse = defaultMouse;
   
   private _grabbedWindow: CustomWindow | null = null;
-  private _mainWindow?: CustomWindow;
   
   // set mouse(mouse: Partial<Mouse>) {
   //   Object.assign(this._mouse, mouse);
 
   //   // console.warn(this._mouse, mouse)
-  // }
-
-
-  // get mainWindow() {
-  //   const window = this._mainWindow ?? this.windows.at(0);
-  //   if (!window) throw new ReferenceError('No "main" window were declared')
-  //   return window;
-  // }
-
-  // setMainWindow(mainWebviewWindowOptions: Omit<Required<WindowOptions>, 'id'>) {
-  //   this.windows.push( this._mainWindow = new CustomWindow( mainWebviewWindowOptions ) )
-  //   return this._mainWindow;
-  // }
-
-  // addWindow() {
-  //   const newId: string = 'view' + this.windows.length;
-  //   const customWindow = new CustomWindow({ id: newId });
-  //   this.windows.push( customWindow );
-  //   return customWindow;
   // }
 
   addWindow(webviewWindowOptions?: Partial<WindowOptions>) {
