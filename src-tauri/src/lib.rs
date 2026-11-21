@@ -1,12 +1,13 @@
 extern crate device_query;
-use device_query::{DeviceQuery,  DeviceState, MouseState};
-// use enigo::{ Enigo, Settings, Mouse };
+use device_query::{DeviceQuery, DeviceState, MouseState};
+use tauri::{ipc::CapabilityBuilder, Manager, Url};
+use tauri::{WebviewUrl, WebviewWindowBuilder};
 
+// use enigo::{ Enigo, Settings, Mouse };
 
 // use tauri::{Emitter, Listener, Manager};
 // use std::time::Duration;
 // use std::thread;
-
 
 // #[tauri::command]
 // fn subscribe_to_mouse_events(app_handle: tauri::AppHandle) {
@@ -32,7 +33,6 @@ use device_query::{DeviceQuery,  DeviceState, MouseState};
 //     }
 // }
 
-
 #[tauri::command]
 fn poll_mouse() -> ((i32, i32), bool) {
     let device_state = DeviceState::new();
@@ -40,7 +40,6 @@ fn poll_mouse() -> ((i32, i32), bool) {
 
     let mouse: MouseState = device_state.get_mouse();
 
-    
     let outdat: ((i32, i32), bool) = (mouse.coords, mouse.button_pressed[1]);
     return outdat.into();
 }
@@ -49,7 +48,6 @@ fn poll_mouse() -> ((i32, i32), bool) {
 // fn mouse_pos() -> (i32, i32) {
 //     // let enigo = Mouse::new().unwrap();
 //     let enigo = Enigo::new(&Settings::default()).unwrap();
-    
 
 //     // let cursor_location = enigo.location().unwrap();
 //     // cursor_location.into()
@@ -57,10 +55,38 @@ fn poll_mouse() -> ((i32, i32), bool) {
 //     cursor_location.into()
 // }
 
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let port: u16 = 1420;
+
     tauri::Builder::default()
+        .plugin(tauri_plugin_localhost::Builder::new(port).build())
+        .setup(move |app| {
+            // In `tauri dev` mode you usually use your dev server.
+            #[cfg(dev)]
+            let url = WebviewUrl::App(std::path::PathBuf::from("/"));
+
+            #[cfg(not(dev))]
+            let url = {
+                let url: Url = format!("http://localhost:{}", port).parse().unwrap();
+
+                app.add_capability(
+                    CapabilityBuilder::new("localhost")
+                        .remote(url.to_string())
+                        .window("helloworld"),
+                )?;
+
+                WebviewUrl::External(url)
+            };
+
+            // This requires you to remove the window from tauri.conf.json
+            WebviewWindowBuilder::new(app, "helloworld".to_string(), url)
+                .title("Localhost Example")
+                .build()?;
+
+            Ok(())
+        })
+
         // .setup(|app| {
         //     // app.listen("download-started", |event| {
         //     //     if let Ok(payload) = serde_json::from_str::<DownloadStarted>(&event.payload()) {

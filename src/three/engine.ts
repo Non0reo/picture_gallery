@@ -20,7 +20,7 @@ export default class ThreeEngine {
     this._isAttachedToMainInstance = representsMainInstance;
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera( 75, mainMonitor.size.width / mainMonitor.size.height, 0.1, 1000 );
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
     // this.renderer.setScissorTest(true);
     // this.renderer.setViewport(0, 0, mainMonitor.size.width, mainMonitor.size.height);
@@ -78,6 +78,7 @@ export default class ThreeEngine {
     if (this.debugOrbit) this.debugOrbit.update()
   }
 
+  
   private _digitalScene() {
     const sphere = new THREE.Mesh(
       new THREE.SphereGeometry(0.5),

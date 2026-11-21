@@ -16,7 +16,8 @@
         "title": "picture-gallery",
         "visible": false,
         "decorations": false,
-        "transparent": true
+        "transparent": true,
+        "resizable": false
       }
     ],
     "security": {

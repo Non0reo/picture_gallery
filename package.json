@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite -- --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
@@ -16,7 +16,7 @@
     "three": "^0.187.0"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2",
+    "@tauri-apps/cli": "^2.12.6",
     "@types/three": "^0.186.0",
     "typescript": "~6.0.3",
     "vite": "^8.0.16"

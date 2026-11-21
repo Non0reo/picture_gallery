@@ -1,6 +1,6 @@
 import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/dpi";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { AnimatableObject, AnimatableParams, createAnimatable, spring, utils } from "animejs";
+import { AnimatableObject, AnimatableParams, createAnimatable } from "animejs";
 import { Mouse, WindowOptions } from "../types";
 import { arrayForm, Input, Position, Size } from '../utils/values'
 import { TauriEvent } from "@tauri-apps/api/event";
@@ -90,6 +90,7 @@ export default class CustomWindow {
         decorations: false,
         visible: false,
         transparent: true,
+        resizable: false,
         width,
         height,
         x,
@@ -153,13 +154,15 @@ export default class CustomWindow {
   private _updateSize() {
     // console.log(this._size)
     // console.log()
-    const now = Temporal.Now.instant().epochMilliseconds;
-    this.webview.setSize(this._size).then(() => console.log(Temporal.Now.instant().epochMilliseconds - now))
+    // const now = Temporal.Now.instant().epochMilliseconds;
+    // this.webview.setSize(this._size).then(() => console.log(Temporal.Now.instant().epochMilliseconds - now))
+    this.webview.setSize(this._size)
   }
 
   private _updatePosition() {
-    const now = Temporal.Now.instant().epochMilliseconds;
-    this.webview.setPosition(this._position).then(() => console.log(Temporal.Now.instant().epochMilliseconds - now))
+    // const now = Temporal.Now.instant().epochMilliseconds;
+    // this.webview.setPosition(this._position).then(() => console.log(Temporal.Now.instant().epochMilliseconds - now))
+    this.webview.setPosition(this._position)
   }
 
   // private async _updateSize() {

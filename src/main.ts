@@ -3,13 +3,15 @@ import './styles.css';
 import { PhysicalPosition, PhysicalSize } from '@tauri-apps/api/window';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { invoke } from '@tauri-apps/api/core';
-import { createTimer, Timer } from 'animejs';
+import { createTimer, engine, Timer } from 'animejs';
 
 import { defaultMouse } from './utils/values';
 import { CustomWindow, WindowsManager } from './windows';
 import { ThreeEngine } from './three'
 import { Mouse } from './types';
 import mainMonitor from './utils/monitor'
+
+engine.pauseOnDocumentHidden = true;
 
 const currentWebview = getCurrentWebviewWindow();
 const deltatimeParagraph = document.getElementById('deltatime') as HTMLParagraphElement;
@@ -137,7 +139,6 @@ class PictureGaleryApp {
       // movable: !this._isMainInstance
     // }, this._isMainInstance );
     }, true );
-    console.log(this.windowManager)
 
     this._threeEngine.attachWindow(this._mainCustomWindow);
 
