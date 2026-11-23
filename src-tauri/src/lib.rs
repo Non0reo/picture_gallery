@@ -1,7 +1,10 @@
 extern crate device_query;
 use device_query::{DeviceQuery, DeviceState, MouseState};
-use tauri::{ipc::CapabilityBuilder, Manager, Url};
+use tauri::{Manager, Url, ipc::CapabilityBuilder};
 use tauri::{WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
+
+use local_ip_address::local_ip;
 
 // use enigo::{ Enigo, Settings, Mouse };
 
@@ -45,6 +48,13 @@ fn poll_mouse() -> ((i32, i32), bool) {
 }
 
 // #[tauri::command]
+// fn get_local_ip() -> String {
+//     let local_ip = local_ip().expect("Could not find the local IP Address");
+//     let host = local_ip.to_string();
+//     return host.into();
+// }
+
+// #[tauri::command]
 // fn mouse_pos() -> (i32, i32) {
 //     // let enigo = Mouse::new().unwrap();
 //     let enigo = Enigo::new(&Settings::default()).unwrap();
@@ -57,48 +67,115 @@ fn poll_mouse() -> ((i32, i32), bool) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // let host: &str = "192.168.68.13";
+    // let host: &str = "127.0.0.1";
+    // let host: &str = "localhost";
+
+    let local_ip = local_ip().expect("Could not find the local IP Address");
+    let host = local_ip.to_string();
+    // let host = get_local_ip();
+
+    // let local_ip_string = local_ip.to_string();
+    // let local_ip_string = if let Ok(local_ip) = local_ip { local_ip.to_string() } else { "localhost" };
+    // let host: &str = if let Ok(local_ip) = local_ip { local_ip.to_string().as_str() } else { "localhost" };
+    // let host = local_ip_string.as_str();
+
+
+    // let local_ip_string = match local_ip() {
+    //     Ok(ip) => ip.to_string(),
+    //     Err(err) => "localhost".to_string(),
+    // };
+    // let host = local_ip_string.as_str().clone();
+
+
     let port: u16 = 1420;
 
+    println!("{}", host);
+
     tauri::Builder::default()
-        .plugin(tauri_plugin_localhost::Builder::new(port).build())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(
+            tauri_plugin_localhost::Builder::new(port)
+                .host(&host)
+                .build(),
+        )
         .setup(move |app| {
-            // In `tauri dev` mode you usually use your dev server.
-            #[cfg(dev)]
-            let url = WebviewUrl::App(std::path::PathBuf::from("/"));
+            //     // In `tauri dev` mode you usually use your dev server.
+            //     // #[cfg(dev)]
+            //     // let url = WebviewUrl::App(std::path::PathBuf::from("/"));
 
-            #[cfg(not(dev))]
-            let url = {
-                let url: Url = format!("http://localhost:{}", port).parse().unwrap();
+            //     // #[cfg(not(dev))]
+            //     // let url = {
+            //     //     let url: Url = format!("http://{}:{}", host, port).parse().unwrap();
 
-                app.add_capability(
-                    CapabilityBuilder::new("localhost")
-                        .remote(url.to_string())
-                        .window("helloworld"),
-                )?;
+            //     //     app.add_capability(
+            //     //         CapabilityBuilder::new(host)
+            //     //             // .permission()
+            //     //             .remote(url.to_string())
+            //     //             .window("main"),
+            //     //     )?;
 
-                WebviewUrl::External(url)
-            };
+            //     //     WebviewUrl::External(url)
+            //     // };
 
-            // This requires you to remove the window from tauri.conf.json
-            WebviewWindowBuilder::new(app, "helloworld".to_string(), url)
-                .title("Localhost Example")
-                .build()?;
+            //     // #[cfg(not(dev))]
+            //     app.add_capability(
+            //         CapabilityBuilder::new(host)
+            //             // .permission()
+            //             .remote(url.to_string())
+            //             .window("main"),
+            //     )?;
+
+            // let url: WebviewUrl = WebviewUrl::External(host.parse().unwrap());
+            // WebviewWindowBuilder::new(app, "main".to_string(), url)
+            //     .title("Localhost Example")
+            //     .build()?;
+
+            //"http://192.168.68.13:*"
+            //"http://" + &host.clone() + ":" + port.to_string()
+
+            // #[cfg(not(dev))]
+            // let url = {
+            //     let url: Url = format!("http://{}:{}", &host, port.to_string()).parse().unwrap();
+            //     let _ = app.add_capability(include_str!("../capabilities/default.json").replace("http://192.168.0.0:*", url.as_str() ));
+
+            //     // WebviewUrl::External(url)
+            // };
+
+            // let url = {
+            //     let url: Url = format!("http://{}:{}", &host, port.to_string()).parse().unwrap();
+
+            //     app.add_capability(
+            //         // CapabilityBuilder::new(&host)
+            //         //     // .permission()
+            //         //     .remote(url.to_string())
+            //         //     .window("main"),
+            //         CapabilityBuilder::from( CapabilityBuilder:: )
+            //     )?;
+
+            //     WebviewUrl::External(url)
+            // };
+
+            // #[cfg(not(dev))]
+            let url: Url = format!("http://{}:{}", &host, port.to_string()).parse().unwrap();
+            let _ = app.add_capability(include_str!("../capabilities/default.json").replace("http://192.168.0.0:*", url.as_str() )); 
+
+            println!("{url}");
+            WebviewUrl::External(url);
+            // app.add
+
+            app.dialog()
+                .message(&host)
+                .kind(MessageDialogKind::Info)
+                .title("Information")
+                .blocking_show();
 
             Ok(())
         })
-
-        // .setup(|app| {
-        //     // app.listen("download-started", |event| {
-        //     //     if let Ok(payload) = serde_json::from_str::<DownloadStarted>(&event.payload()) {
-        //     //     println!("downloading {}", payload.url);
-        //     //     }
-        //     // });
-        //     app.emit(event, payload)
-        //     Ok(())
-        // })
         .plugin(tauri_plugin_opener::init())
         // .invoke_handler(tauri::generate_handler![mouse_pos])
         .invoke_handler(tauri::generate_handler![poll_mouse])
+        // .invoke_handler(tauri::generate_handler![get_local_ip])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
