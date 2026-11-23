@@ -1,6 +1,6 @@
 use tauri_build::AppManifest;
 
-const COMMANDS: &[&str] = &["poll_mouse"/* , "get_local_ip" */];
+const COMMANDS: &[&str] = &["poll_mouse", "get_local_ip"];
 
 fn main() {
     // tauri_build::build();

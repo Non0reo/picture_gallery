@@ -8,6 +8,7 @@
   "remote": {
     "urls": [
       "http://localhost:*",
+      "localhost:*",
       "http://127.0.0.1:*",
       "http://192.168.0.0:*"
     ]
@@ -28,6 +29,7 @@
     "core:window:allow-set-focus",
     "core:window:allow-set-always-on-top",
     "allow-poll-mouse",
+    "allow-get-local-ip",
     "dialog:default"
   ]
 }

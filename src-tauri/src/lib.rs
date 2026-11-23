@@ -47,12 +47,12 @@ fn poll_mouse() -> ((i32, i32), bool) {
     return outdat.into();
 }
 
-// #[tauri::command]
-// fn get_local_ip() -> String {
-//     let local_ip = local_ip().expect("Could not find the local IP Address");
-//     let host = local_ip.to_string();
-//     return host.into();
-// }
+#[tauri::command]
+fn get_local_ip() -> String {
+    let local_ip = local_ip().expect("Could not find the local IP Address");
+    let host = local_ip.to_string();
+    return host.into();
+}
 
 // #[tauri::command]
 // fn mouse_pos() -> (i32, i32) {
@@ -71,9 +71,9 @@ pub fn run() {
     // let host: &str = "127.0.0.1";
     // let host: &str = "localhost";
 
-    let local_ip = local_ip().expect("Could not find the local IP Address");
-    let host = local_ip.to_string();
-    // let host = get_local_ip();
+    // let local_ip = local_ip().expect("Could not find the local IP Address");
+    // let host = local_ip.to_string();
+    let host = get_local_ip();
 
     // let local_ip_string = local_ip.to_string();
     // let local_ip_string = if let Ok(local_ip) = local_ip { local_ip.to_string() } else { "localhost" };
@@ -158,7 +158,8 @@ pub fn run() {
 
             // #[cfg(not(dev))]
             let url: Url = format!("http://{}:{}", &host, port.to_string()).parse().unwrap();
-            let _ = app.add_capability(include_str!("../capabilities/default.json").replace("http://192.168.0.0:*", url.as_str() )); 
+            let _ = app
+                .add_capability(include_str!("../capabilities/default.json").replace("http://192.168.0.0:*", url.as_str() )); 
 
             println!("{url}");
             WebviewUrl::External(url);
@@ -174,8 +175,7 @@ pub fn run() {
         })
         .plugin(tauri_plugin_opener::init())
         // .invoke_handler(tauri::generate_handler![mouse_pos])
-        .invoke_handler(tauri::generate_handler![poll_mouse])
-        // .invoke_handler(tauri::generate_handler![get_local_ip])
+        .invoke_handler(tauri::generate_handler![poll_mouse, get_local_ip])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
