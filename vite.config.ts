@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 import process from "node:process";
 
 const host = process.env.TAURI_DEV_HOST;
-console.log(process.env)
+// console.log(process.env)
 
 // https://vite.dev/config/
 export default defineConfig(() => ({
@@ -16,8 +16,8 @@ export default defineConfig(() => ({
   server: {
     port: 1420,
     strictPort: true,
-    host: host || false,
-    // host: '192.168.68.13',
+    // host: host || false,
+    host: '192.168.68.13',
     hmr: host
       ? {
           protocol: "ws",
