@@ -166,7 +166,8 @@ pub fn run() {
 
             // #[cfg(not(dev))]
             let url: Url = format!("http://{}:{}", &host, port.to_string()).parse().unwrap();
-            let _ = app.add_capability(include_str!("../capabilities/default.json").replace("http://192.168.0.0:*", url.as_str() )); 
+            let _ = app
+                .add_capability(include_str!("../capabilities/default.json").replace("http://192.168.0.0:*", url.as_str() )); 
 
             WebviewUrl::External(url);
             // app.add
