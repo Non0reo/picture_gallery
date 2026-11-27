@@ -1,7 +1,7 @@
-# Tauri + Vanilla TS
+# Picture Gallery
 
-This template should help get you started developing with Tauri in vanilla HTML, CSS and Typescript.
 
-## Recommended IDE Setup
+## HTTP Server (Picture receiver)
+The HTTP server will automaticaly start on port `1425`
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+-> Remember to reactivate any firewall on the computer to let access to this port from any other devices on the local network.

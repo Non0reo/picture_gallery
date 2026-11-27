@@ -27,6 +27,8 @@ device_query = "4.0.1"
 tauri-plugin-localhost = "2"
 local-ip-address = "0.6.13"
 tauri-plugin-dialog = "2"
+actix-web = "4"
+actix-files = "0.7.5"
 
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration

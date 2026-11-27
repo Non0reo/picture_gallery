@@ -1,10 +1,16 @@
+mod server;
+
 extern crate device_query;
 use device_query::{DeviceQuery, DeviceState, MouseState};
-use tauri::{Manager, Url, ipc::CapabilityBuilder};
-use tauri::{WebviewUrl, WebviewWindowBuilder};
-use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
+use tauri::{Manager, Url};
+use tauri::{WebviewUrl};
 
 use local_ip_address::local_ip;
+use std::thread;
+
+
+
+
 
 // use enigo::{ Enigo, Settings, Mouse };
 
@@ -49,8 +55,9 @@ fn poll_mouse() -> ((i32, i32), bool) {
 
 #[tauri::command]
 fn get_local_ip_path() -> (String, u16) {
-    let local_ip = local_ip().expect("Could not find the local IP Address");
-    let host = local_ip.to_string();
+    // let local_ip = local_ip().expect("Could not find the local IP Address");
+    // let host = local_ip.to_string();
+    let host = "0.0.0.0".to_string();
     let port: u16 = 1420;
     return (host, port).into();
 }
@@ -65,6 +72,12 @@ fn get_local_ip_path() -> (String, u16) {
 //     let cursor_location = enigo.location().unwrap();
 //     cursor_location.into()
 // }
+
+
+
+
+
+
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -100,14 +113,20 @@ pub fn run() {
         .plugin(
             tauri_plugin_localhost::Builder::new(port)
                 .host(&host)
-                .on_request(|request, response| {
-                    println!("Request: {}", request.url());
-                    // response.add_header("header", value);
-                    
-                })
                 .build(),
         )
         .setup(move |app| {
+
+            let handle = app.handle().clone();
+            let boxed_handle = Box::new(handle);
+
+            thread::spawn(move || {
+                server::init(*boxed_handle).unwrap();
+            });
+
+            // Ok(());
+
+            
             //     // In `tauri dev` mode you usually use your dev server.
             //     // #[cfg(dev)]
             //     // let url = WebviewUrl::App(std::path::PathBuf::from("/"));
@@ -172,11 +191,11 @@ pub fn run() {
             WebviewUrl::External(url);
             // app.add
 
-            app.dialog()
-                .message(format!("http://{}:{}", &host, port.to_string()).to_string())
-                .kind(MessageDialogKind::Info)
-                .title("Information")
-                .blocking_show();
+            // app.dialog()
+            //     .message(format!("http://{}:{}", &host, port.to_string()).to_string())
+            //     .kind(MessageDialogKind::Info)
+            //     .title("Information")
+            //     .blocking_show();
 
             Ok(())
         })
