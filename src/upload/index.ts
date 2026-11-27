@@ -1,4 +1,23 @@
-console.log('UPLOAD')
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://isczyjfurffqhqmpyrfq.supabase.co', import.meta.env.VITE_STORAGE_KEY)
+
+
+
+console.log(supabase)
+console.log(await supabase.storage.listBuckets());
+
+// const { data, error } = await supabase.storage.getBucket('pictures').
+
+const bucket = await supabase.storage.from('pictures');
+const fileList = await bucket.list()
+
+console.log(fileList)
+
+fileList.data?.forEach(async file => {
+  const picture = await bucket.download(`${file.name}`);
+  console.log(picture)
+})
 
 
 const fileInput = document.querySelector('input') as HTMLInputElement;
@@ -16,20 +35,13 @@ fileInput?.addEventListener('change', (e) => {
   selectedImage.src = url;
 })
 
-uploadButton?.addEventListener('click', e => {
+uploadButton?.addEventListener('click', async e => {
   console.log(e, window)
 
-  const data = new FormData()
-  data.append('file', uploadedFile);
+  const infoP = document.querySelector('#info') as HTMLParagraphElement;
 
-  const url = new URL(window.location.href);
-  url.port = "1425";
-  url.pathname = "/api/send";
+  const { name } = uploadedFile;
+  const { data, error } = await bucket.upload(name, uploadedFile);
 
-  console.log(url);
-
-  fetch(url, {
-    method: 'POST',
-    body: data
-  })
+  if (error) infoP.textContent = error.message;
 });

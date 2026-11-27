@@ -10,6 +10,7 @@ import { CustomWindow, WindowsManager } from './windows';
 import { ThreeEngine } from './three'
 import { Mouse } from './types';
 import mainMonitor from './utils/monitor'
+import { Database } from './database';
 
 engine.pauseOnDocumentHidden = true;
 
@@ -28,6 +29,7 @@ class PictureGaleryApp {
   private _mainCustomWindow?: CustomWindow;
   private _isMainInstance = this._mainWebview.label === 'main';
   private _threeEngine = new ThreeEngine(this._isMainInstance);
+  private _database = new Database();
   private _startupSize = 1; //It don't work with 0
   
     
@@ -158,6 +160,7 @@ class PictureGaleryApp {
     const addWindowButton = document.querySelector('.addWindow') as HTMLButtonElement;
     const closeWindowsButton = document.querySelector('.closeAll') as HTMLButtonElement;
     const shrink = document.querySelector('.shrink') as HTMLButtonElement;
+    const database = document.querySelector('.database') as HTMLButtonElement;
 
     addWindowButton?.addEventListener('click', () => {
       this.windowManager?.declareCustomWindow({
@@ -173,7 +176,11 @@ class PictureGaleryApp {
     shrink?.addEventListener('click', () => this.windowManager?.windows.forEach(win => {
       setTimeout(() => win.centerSize = [100, 100], 1000)
       setTimeout(() => win.centerSize = [400, 300], 2000)
-    }))
+    }));
+
+    database.addEventListener('click', () => {
+      this._database.getAllPictures();
+    })
   }
 
 

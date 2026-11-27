@@ -1,9 +1,8 @@
 use std::{sync::Mutex};
 
-use actix_files::{NamedFile};
-use actix_web::{HttpRequest, Result};
-use actix_web::{App, HttpServer, Responder, get, middleware, post, web};
-use tauri::{AppHandle};
+use actix_web::{App, HttpResponse, HttpServer, Responder, get, middleware, post, web};
+use serde::Deserialize;
+use tauri::{AppHandle, Emitter};
 
 struct TauriAppState {
     app: Mutex<AppHandle>,
@@ -36,17 +35,39 @@ struct TauriAppState {
 //     // Ok(web::Html::)
 // }
 
-#[get("/")]
-async fn index(_req: HttpRequest) -> Result<NamedFile> {
-    println!("Requested Index");
-    Ok(NamedFile::open("index.html")?)
+// #[get("/")]
+// async fn index(_req: HttpRequest) -> Result<NamedFile> {
+//     println!("Requested Index");
+//     Ok(NamedFile::open("index.html")?)
+// }
+
+
+#[derive(Deserialize)]
+struct UploadPayload {
+    file: String,
+}
+
+
+#[get("/api/ping")]
+pub async fn ping() -> actix_web::Result<impl Responder> {
+    let text = "hello world";
+    // let text = _req.file.as_str();
+    println!("{}", text);
+    // print!("{}", );
+
+    Ok(text.to_string())
 }
 
 
 #[post("/api/send")]
-pub async fn send_data() -> actix_web::Result<impl Responder> {
-    let text = "hello world";
-    println!("{}",text);
+pub async fn send_data(_req: web::Bytes) -> actix_web::Result<impl Responder> {
+    let text = "got_request";
+
+    println!("Got request");
+
+    // let text = ;
+    // println!("{}", text);
+    // print!("{}", );
 
     Ok(text.to_string())
 }
@@ -70,7 +91,7 @@ pub async fn init(app: AppHandle) -> std::io::Result<()> {
         App::new()
             .app_data(tauri_app.clone())
             .wrap(middleware::Logger::default())
-            .service(index)
+            // .service(index)
             // .route(
             //     "/",
             //     web::get()
@@ -80,6 +101,18 @@ pub async fn init(app: AppHandle) -> std::io::Result<()> {
             //                 .index_file("index.html")
             //                 .use_last_modified(true)
             //         )
+            //         // .into()
+            // )
+            .service(ping)
+            // .route(
+            //     "/api/send",
+            //     web::post()
+            //         .to(|| {
+            //             // app.emit("data_uploaded", ());
+            //             // Ok("posted".to_string())
+
+            //             // HttpResponse::Ok()
+            //         })
             //         // .into()
             // )
             .service(send_data)

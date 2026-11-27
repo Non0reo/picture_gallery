@@ -120,9 +120,9 @@ pub fn run() {
             let handle = app.handle().clone();
             let boxed_handle = Box::new(handle);
 
-            thread::spawn(move || {
-                server::init(*boxed_handle).unwrap();
-            });
+            // thread::spawn(move || {
+            //     server::init(*boxed_handle).unwrap();
+            // });
 
             // Ok(());
 
